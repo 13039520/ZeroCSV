@@ -29,7 +29,7 @@ static void CsvRead(string filePath, int skipRows, int readLimit)
             rows = e.RowNum;
             if (rows % 50000 == 0)
             {
-                //string s1 = e.GetValue("FS_WEIGHTNO");
+                //string s1 = e.GetValue("ID");
                 //string s2 = e.GetValue(0);
                 Console.WriteLine(string.Format("Rows {0} : {1}", e.RowNum, string.Join("|", e.Values)));
             }

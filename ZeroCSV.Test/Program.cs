@@ -86,8 +86,8 @@ namespace ZeroCSV.Test
                 SaveDir = directory,
                 SaveFilePrefix = saveFilePrefix,
                 SingleFileRecordLimit = 0,
-                UseEncoding=Encoding.Default,
-                DateTimeFormat="yyyy-MM-dd HH:mm:ss.fff",
+                UseEncoding = Encoding.Default,
+                DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
                 NumberDisplayToStr = false,
                 OnWriteLineHandler = (e) => {
                     if (e.FileRowNum % 50000 == 0)

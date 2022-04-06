@@ -53,7 +53,7 @@ namespace ZeroCSV
         public delegate void EndHandler(Exception e);
         public delegate void StartHandler();
 
-        #region -- 私有成员变量 --
+        #region -- private fields --
         private Encoding _UseEncoding = Encoding.Default;
         private int _ReadBlockSize = 1024 * 4;
         private string _ColChars = ",";
@@ -85,26 +85,11 @@ namespace ZeroCSV
         private string _StrColBoundaryChars2 = "";
         #endregion
 
-        #region -- 属性 --
-        /// <summary>
-        /// 跳过头部的行数(默认0)
-        /// </summary>
+        #region -- public properties --
         public int SkipRows { get { return _SkipRows; }set { _SkipRows = value; } }
-        /// <summary>
-        /// 单次读取文件块大小(默认4KB)
-        /// </summary>
         public int ReadBlockSize { get { return _ReadBlockSize; }set { if (value > 0) { _ReadBlockSize = value; } } }
-        /// <summary>
-        /// 列分隔符(默认",")
-        /// </summary>
         public string ColChars { get { return _ColChars; } set { _ColChars = value; } }
-        /// <summary>
-        /// 行结束符(默认"\\r\\n")
-        /// </summary>
         public string RowChars { get { return _RowChars; } set { _RowChars = value; } }
-        /// <summary>
-        /// 字符串列边界符(默认"\"")
-        /// </summary>
         public string StrColBoundaryChars { get { return _StrColBoundaryChars; } set { _StrColBoundaryChars = value; } }
         public Encoding UseEncoding { get { return _UseEncoding; } set { _UseEncoding = value; } }
         public HeadHandler OnHeadHandler { get; set; }

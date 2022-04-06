@@ -759,22 +759,26 @@ namespace ZeroCSV
             if (sourceIndex > -1 && frame.Length > 0 && frame.Length + sourceIndex <= source.Length)
             {
                 int myLen = source.Length - frame.Length + 1;
-                for (int i = sourceIndex; i < myLen; i++)
+                int i = sourceIndex;
+                while (i < myLen)
                 {
                     if (source[i] == frame[0])
                     {
                         if (frame.Length < 2) { return i; }
                         bool flag = true;
-                        for (int j = 1; j < frame.Length; j++)
+                        int j = 1;
+                        while (j < frame.Length)
                         {
                             if (source[i + j] != frame[j])
                             {
                                 flag = false;
                                 break;
                             }
+                            j++;
                         }
                         if (flag) { return i; }
                     }
+                    i++;
                 }
             }
             return -1;

@@ -169,13 +169,13 @@ namespace ZeroCSV.Test
                 new MyEntity { ID = 5, Name = "Name5" });
 
             //Write Batch 2:
-            List<MyEntity> myClasses = new List<MyEntity>();
-            myClasses.Add(new MyEntity { ID = 6, Name = "Name6" });
-            myClasses.Add(new MyEntity { ID = 7, Name = "Name7" });
-            myClasses.Add(new MyEntity { ID = 8, Name = "Name8" });
-            myClasses.Add(new MyEntity { ID = 9, Name = "Name9" });
-            myClasses.Add(new MyEntity { ID = 10, Name = "Name10" });
-            toCSV.Write(myClasses);
+            List<MyEntity> list = new List<MyEntity>();
+            list.Add(new MyEntity { ID = 6, Name = "Name6" });
+            list.Add(new MyEntity { ID = 7, Name = "Name7" });
+            list.Add(new MyEntity { ID = 8, Name = "Name8" });
+            list.Add(new MyEntity { ID = 9, Name = "Name9" });
+            list.Add(new MyEntity { ID = 10, Name = "Name10" });
+            toCSV.Write(list);
 
             toCSV.Close();
 

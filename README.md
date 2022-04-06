@@ -54,8 +54,9 @@ static void CsvRead(string filePath, int skipRows, int readLimit)
 }
 ````
 ## csv file writing example
+### DataReaderToCSV
 ```` C#
-static void CsvWrite(string dir, string saveFilePrefix)
+static void DataReaderToCSV(string dir, string saveFilePrefix)
 {
     System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(dir);
     if (!directory.Exists)
@@ -95,6 +96,70 @@ static void CsvWrite(string dir, string saveFilePrefix)
             
     stopwatch.Start();
     toCSV.Write(conn, "SELECT * FROM MyBankStatement");
+    //toCSV.Write(System.Data.IDataReader reader);
 
+}
+````
+### DataEntityToCSV
+```` C#
+public class MyEntity
+{
+    public int ID { get; set; }
+    public string Name { get; set; }
+}
+static void DataEntityToCSV(string dir, string saveFilePrefix)
+{
+    System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(dir);
+    if (!directory.Exists)
+    {
+        directory.Create();
+    }
+    System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+    ZeroCSV.DataEntityToCSV<MyEntity> toCSV = new DataEntityToCSV<MyEntity>
+    {
+        SaveDir = directory,
+        SaveFilePrefix = saveFilePrefix,
+        SingleFileRecordLimit = 0,
+        UseEncoding = Encoding.Default,
+        DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
+        NumberDisplayToStr = false,
+        OnWriteLineHandler = (e) => {
+            if (e.FileRowNum % 50000 == 0)
+            {
+                ShowMsg(string.Format("FileNum={0}&FileRowNum={1} : \r\n【{2}】", e.FileNum, e.FileRowNum, e.FileRowStr));
+            }
+        },
+        OnWriteFileEndHandler = (e) => {
+            ShowMsg(string.Format("FileNum={0}&FileRowNum={1}&SourceRowNum={2} : \r\n【{3}】", e.FileNum, e.FileRowNum, e.SourceRowNum, e.FileRowStr), ConsoleColor.Yellow);
+        },
+        OnWriteBatchEndHandler = (e) => {
+            //e.Close = e.BatchNum == 2;
+            ShowMsg("Write Batch " + e.BatchNum + " End.");
+        },
+        OnDisposedHandler = () => {
+            stopwatch.Stop();
+            ShowMsg(string.Format("Disposed : TotalSeconds={0}", stopwatch.Elapsed.TotalSeconds), ConsoleColor.Red);
+        }
+    };
+    stopwatch.Start();
+
+    //Write Batch 1:
+    toCSV.Write(
+        new MyEntity { ID = 1, Name = "Name1" },
+        new MyEntity { ID = 2, Name = "Name2" },
+        new MyEntity { ID = 3, Name = "Name3" },
+        new MyEntity { ID = 4, Name = "Name4" },
+        new MyEntity { ID = 5, Name = "Name5" });
+    
+    //Write Batch 2:
+    List<MyEntity> myClasses = new List<MyEntity>();
+    myClasses.Add(new MyEntity { ID = 6, Name = "Name6" });
+    myClasses.Add(new MyEntity { ID = 7, Name = "Name7" });
+    myClasses.Add(new MyEntity { ID = 8, Name = "Name8" });
+    myClasses.Add(new MyEntity { ID = 9, Name = "Name9" });
+    myClasses.Add(new MyEntity { ID = 10, Name = "Name10" });
+    toCSV.Write(myClasses);
+    
+    toCSV.Close();
 }
 ````

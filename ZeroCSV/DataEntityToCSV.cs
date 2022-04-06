@@ -7,29 +7,30 @@ namespace ZeroCSV
 {
     public class DataEntityToCSV<T> : Writer where T: class
     {
-        public class WriteDataEndArgs : EventArgs
+        public class WriteBatchEndArgs : EventArgs
         {
-            public bool CloseWriteStream { get; set; }
-            public readonly List<T> Source = null;
-            public WriteDataEndArgs(List<T> source)
+            public bool Close { get; set; }
+            public int BatchNum { get; }
+            public WriteBatchEndArgs(int batchNum)
             {
-                this.CloseWriteStream = false;
-                this.Source = source;
+                this.Close = false;
+                this.BatchNum = batchNum;
             }
         }
-        public delegate void WriteDataEndHandler(WriteDataEndArgs e);
+        public delegate void WriteBatchEndHandler(WriteBatchEndArgs e);
 
-        private static object initLock = new object();
+        private static object myLock = new object();
         private bool isFirst = true;
         private PropertyInfo[] properties = null;
         private int propertyCount = 0;
+        private int batchNum = 0;
 
-        public WriteDataEndHandler OnWriteDataEndHandler { get; set; }
+        public WriteBatchEndHandler OnWriteBatchEndHandler { get; set; }
 
         private void PropertyInfoInit()
         {
             if (!isFirst) { return; }
-            lock (initLock)
+            lock (myLock)
             {
                 if (!isFirst) { return; }
                 Type type = typeof(T);
@@ -79,13 +80,17 @@ namespace ZeroCSV
                 }
                 i++;
             }
-            if (OnWriteDataEndHandler != null)
+            lock (myLock)
+            {
+                batchNum++;
+            }
+            if (OnWriteBatchEndHandler != null)
             {
                 try
                 {
-                    WriteDataEndArgs result = new WriteDataEndArgs(data);
-                    OnWriteDataEndHandler(result);
-                    if (result.CloseWriteStream)
+                    WriteBatchEndArgs result = new WriteBatchEndArgs(batchNum);
+                    OnWriteBatchEndHandler(result);
+                    if (result.Close)
                     {
                         base.Close();
                     }

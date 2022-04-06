@@ -9,16 +9,20 @@ namespace ZeroCSV
         public class WriteBatchEndArgs : EventArgs
         {
             public bool Close { get; set; }
-            public WriteBatchEndArgs()
+            public int BatchNum { get; }
+            public WriteBatchEndArgs(int batchNum)
             {
                 this.Close = false;
+                this.BatchNum = batchNum;
             }
         }
         public delegate void WriteBatchEndHandler(WriteBatchEndArgs e);
         public delegate System.Data.IDataReader GetDataReaderHandler();
 
+        private static object myLock = new object();
         private int fieldCount = 0;
         private bool isFirst = true;
+        private int batchNum = 0;
 
         public WriteBatchEndHandler OnWriteBatchEndHandler { get; set; }
 
@@ -53,11 +57,15 @@ namespace ZeroCSV
                 base.Write(values);
             }
             source.Close();
+            lock (myLock)
+            {
+                batchNum++;
+            }
             if (OnWriteBatchEndHandler != null)
             {
                 try
                 {
-                    WriteBatchEndArgs result = new WriteBatchEndArgs();
+                    WriteBatchEndArgs result = new WriteBatchEndArgs(batchNum);
                     OnWriteBatchEndHandler(result);
                     if (result.Close)
                     {

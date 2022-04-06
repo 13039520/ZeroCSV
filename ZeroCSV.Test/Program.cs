@@ -61,8 +61,7 @@ namespace ZeroCSV.Test
                     {
                         ShowMsg("Error : " + ex.Message);
                     }
-                    double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-                    ShowMsg(string.Format("The end : TotalSeconds={0}&Columns={1}&Rows={2}&ReadInOneSecond={3}", totalSeconds, cols, rows, Convert.ToInt32(rows / totalSeconds)), ConsoleColor.Red);
+                    ShowMsg(string.Format("The end : TotalSeconds={0}&Columns={1}&Rows={2}", stopwatch.Elapsed.TotalSeconds, cols, rows), ConsoleColor.Red);
                 }
             };
             //reading

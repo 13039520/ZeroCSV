@@ -141,6 +141,8 @@ namespace ZeroCSV
         {
             _Read(stream);
         }
+
+
         private void _Read(Stream stream)
         {
             Exception myEx = null;

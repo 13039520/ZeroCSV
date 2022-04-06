@@ -108,11 +108,11 @@ namespace ZeroCSV.Test
                 }
             };
 
-            string connStr = "Data Source=.;Initial Catalog=BankStatementAnalysis;User ID=sa;Password=yangshaogao;";
+            string connStr = "Data Source=.;Initial Catalog=BankStatement;User ID=sa;Password=123456;";
             Microsoft.Data.SqlClient.SqlConnection conn = new Microsoft.Data.SqlClient.SqlConnection(connStr);
             
             stopwatch.Start();
-            toCSV.Write(conn, "SELECT * FROM CaseBankStatement");
+            toCSV.Write(conn, "SELECT * FROM MyBankStatement");
 
         }
 

@@ -41,8 +41,8 @@ namespace ZeroCSV
         public delegate void WriteFileEndHandler(WriteLineEventArgs args);
         public delegate void DisposedHandler();
 
-        private string _ColChars = ",";
-        private string _RowChars = "\r\n";
+        private string _ColSeparator = ",";
+        private string _RowSeparator = "\r\n";
         private string _StrColBoundaryChars = "\"";
         private string[] _ColNames = null;
         private string[] _ColTypeNames = null;
@@ -68,42 +68,15 @@ namespace ZeroCSV
         private static object fileNumLock = new object();
         private static object rowNumLock = new object();
 
-        #region -- 属性 --
-        /// <summary>
-        /// 列分隔符
-        /// </summary>
-        public string ColChars { get { return _ColChars; } set { _ColChars = value; } }
-        /// <summary>
-        /// 行结束符
-        /// </summary>
-        public string RowChars { get { return _RowChars; } set { _RowChars = value; } }
-        /// <summary>
-        /// 字符串列边界符
-        /// </summary>
-        public string StrColBoundaryChars { get { return _StrColBoundaryChars; } set { _StrColBoundaryChars = value; } }
-        /// <summary>
-        /// 列顺序(受保护，仅派生类能设置)
-        /// </summary>
+        #region -- public properties --
         protected string[] ColNames { get { return _ColNames; } set { _ColNames = value; } }
-        /// <summary>
-        /// 使用编码
-        /// </summary>
+        public string ColSeparator { get { return _ColSeparator; } set { _ColSeparator = value; } }
+        public string RowSeparator { get { return _RowSeparator; } set { _RowSeparator = value; } }
+        public string StrColBoundaryChars { get { return _StrColBoundaryChars; } set { _StrColBoundaryChars = value; } }
         public Encoding UseEncoding { get { return _UseEncoding; } set { _UseEncoding = value; } }
-        /// <summary>
-        /// 保存到目录
-        /// </summary>
         public System.IO.DirectoryInfo SaveDir { get { return _SaveDir; } set { _SaveDir = value; } }
-        /// <summary>
-        /// 保存文件的前缀
-        /// </summary>
         public string SaveFilePrefix { get { return _SaveFilePrefix; } set { _SaveFilePrefix = value; } }
-        /// <summary>
-        /// 单个文件保存记录条数上限(小于1视为无上限)
-        /// </summary>
         public long SingleFileRecordLimit { get { return _SingleFileRecordLimit; } set { if (value > -1) { _SingleFileRecordLimit = value; } } }
-        /// <summary>
-        /// 日期时间格式化
-        /// </summary>
         public string DateTimeFormat { get { return _DateTimeFormat; } set { if (!string.IsNullOrEmpty(value)) { _DateTimeFormat = value; } } }
         public bool NumberDisplayToStr { get { return _NumberDisplayToStr; } set { _NumberDisplayToStr = value; } }
         public WriteLineHandler OnWriteLineHandler { get; set; }
@@ -177,7 +150,7 @@ namespace ZeroCSV
                     t[n] = ColToStr(cols[n], "String");
                     n++;
                 }
-                return string.Join(ColChars, t) + RowChars;
+                return string.Join(ColSeparator, t) + RowSeparator;
             }
             if (!_ColTypeNamesLoadingFinished)
             {
@@ -203,7 +176,7 @@ namespace ZeroCSV
                 s[i] = ColToStr(cols[i], _ColTypeNames[i]);
                 i++;
             }
-            return string.Join(ColChars, s) + RowChars;
+            return string.Join(ColSeparator, s) + RowSeparator;
         }
         private void Write(string line)
         {
@@ -270,9 +243,9 @@ namespace ZeroCSV
             {
                 case "String":
                     reval = value.ToString();
-                    bool hasColChars = reval.IndexOf(ColChars) > -1;
+                    bool hasColSeparator = reval.IndexOf(ColSeparator) > -1;
                     bool hasStrColBoundaryChars = reval.IndexOf(StrColBoundaryChars) > -1;
-                    if (hasColChars || hasStrColBoundaryChars || reval.IndexOf(RowChars) > -1)
+                    if (hasColSeparator || hasStrColBoundaryChars || reval.IndexOf(RowSeparator) > -1)
                     {
                         if (hasStrColBoundaryChars)
                         {

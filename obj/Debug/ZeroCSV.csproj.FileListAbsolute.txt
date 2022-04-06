@@ -1,6 +1,0 @@
-D:\Work\ZeroCSV\ZeroCSV\bin\Debug\ZeroCSV.dll
-D:\Work\ZeroCSV\ZeroCSV\bin\Debug\ZeroCSV.pdb
-D:\Work\ZeroCSV\ZeroCSV\obj\Debug\ZeroCSV.csproj.AssemblyReference.cache
-D:\Work\ZeroCSV\ZeroCSV\obj\Debug\ZeroCSV.csproj.CoreCompileInputs.cache
-D:\Work\ZeroCSV\ZeroCSV\obj\Debug\ZeroCSV.dll
-D:\Work\ZeroCSV\ZeroCSV\obj\Debug\ZeroCSV.pdb

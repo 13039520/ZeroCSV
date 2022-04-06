@@ -1,0 +1,6 @@
+D:\Work\ZeroCSV\ZeroCSV\bin\Release\ZeroCSV.dll
+D:\Work\ZeroCSV\ZeroCSV\bin\Release\ZeroCSV.pdb
+D:\Work\ZeroCSV\ZeroCSV\obj\Release\ZeroCSV.csproj.CoreCompileInputs.cache
+D:\Work\ZeroCSV\ZeroCSV\obj\Release\ZeroCSV.dll
+D:\Work\ZeroCSV\ZeroCSV\obj\Release\ZeroCSV.pdb
+D:\Work\ZeroCSV\ZeroCSV\obj\Release\ZeroCSV.csproj.AssemblyReference.cache

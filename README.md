@@ -1,6 +1,6 @@
 # ZeroCSV
  Read and write large csv files in byte stream mode
-## csv file reading example
+## CSV file reading example
 ````C#
 static void CsvRead(string filePath, int skipRows, int readLimit)
 {
@@ -53,7 +53,7 @@ static void CsvRead(string filePath, int skipRows, int readLimit)
     //reader.Read(System.IO.FileStream stream);
 }
 ````
-## csv file writing example
+## CSV file writing example
 ### DataReaderToCSV
 ```` C#
 static void DataReaderToCSV(string dir, string saveFilePrefix)

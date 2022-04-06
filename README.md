@@ -53,3 +53,48 @@ static void CsvRead(string filePath, int skipRows, int readLimit)
     //reader.Read(System.IO.FileStream stream);
 }
 ````
+## csv file writing example
+```` C#
+static void CsvWrite(string dir, string saveFilePrefix)
+{
+    System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(dir);
+    if (!directory.Exists)
+    {
+        directory.Create();
+    }
+    System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
+    ZeroCSV.DataReaderToCSV toCSV = new DataReaderToCSV
+    {
+        SaveDir = directory,
+        SaveFilePrefix = saveFilePrefix,
+        SingleFileRecordLimit = 0,
+        UseEncoding = Encoding.Default,
+        DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
+        NumberDisplayToStr = false,
+        OnWriteLineHandler = (e) => {
+            if (e.FileRowNum % 50000 == 0)
+            {
+                Console.WriteLine(string.Format("FileNum={0}&FileRowNum={1} : \r\n【{2}】", e.FileNum, e.FileRowNum, e.FileRowStr));
+            }
+        },
+        OnWriteFileEndHandler = (e) => {
+            Console.WriteLine(string.Format("FileNum={0}&FileRowNum={1}&SourceRowNum={2} : \r\n【{3}】", e.FileNum, e.FileRowNum, e.SourceRowNum, e.FileRowStr), ConsoleColor.Yellow);
+        },
+        OnWriteBatchEndHandler = (e) => {
+            e.Close = true;
+            Console.WriteLine("Closing.");
+        },
+        OnDisposedHandler = () => {
+            stopwatch.Stop();
+            Console.WriteLine(string.Format("Disposed : TotalSeconds={0}", stopwatch.Elapsed.TotalSeconds));
+        }
+    };
+
+    string connStr = "Data Source=.;Initial Catalog=BankStatement;User ID=sa;Password=123456;";
+    Microsoft.Data.SqlClient.SqlConnection conn = new Microsoft.Data.SqlClient.SqlConnection(connStr);
+            
+    stopwatch.Start();
+    toCSV.Write(conn, "SELECT * FROM MyBankStatement");
+
+}
+````

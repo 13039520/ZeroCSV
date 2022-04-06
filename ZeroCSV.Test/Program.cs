@@ -21,33 +21,32 @@ namespace ZeroCSV.Test
                 System.Threading.Thread.Sleep(1000);
             }
         }
-        static void CsvRead(string filepath, int skipRows, int maxRows)
+        static void CsvRead(string filePath, int skipRows, int readLimit)
         {
-            bool useMaxRows = maxRows > 0;
-            int colCount = 0;
-            long rowCount = 0;
+            bool useLimit = readLimit > 0;
+            int cols = 0;
+            long rows = 0;
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
             ZeroCSV.Reader reader = new ZeroCSV.Reader
             {
                 SkipRows = skipRows,
                 UseEncoding = Encoding.Default,
-                OnStartHandler = () =>
-                {
+                OnStartHandler = () => {
                     stopwatch.Start();
                 },
                 OnHeadHandler = (e) =>
                 {
-                    colCount = e.Names.Length;
+                    cols = e.Names.Length;
                     ShowMsg(string.Format("Columns({0}) : {1}", e.Names.Length, string.Join("|", e.Names)));
                 },
                 OnRowHandler = (e) =>
                 {
-                    if (useMaxRows && e.RowNum == maxRows)
+                    if (useLimit && e.RowNum == readLimit)
                     {
                         e.Next = false;//stop
                     }
-                    rowCount = e.RowNum;
-                    if (rowCount % 50000 == 0)
+                    rows = e.RowNum;
+                    if (rows % 50000 == 0)
                     {
                         //string s1 = e.GetValue("FS_WEIGHTNO");
                         //string s2 = e.GetValue(0);
@@ -62,10 +61,16 @@ namespace ZeroCSV.Test
                         ShowMsg("Error : " + ex.Message);
                     }
                     double totalSeconds = stopwatch.Elapsed.TotalSeconds;
-                    ShowMsg(string.Format("The end : TotalSeconds={0}&Columns={1}&Rows={2}&ReadInOneSecond={3}", totalSeconds, colCount, rowCount, Convert.ToInt32(rowCount / totalSeconds)), ConsoleColor.Red);
+                    ShowMsg(string.Format("The end : TotalSeconds={0}&Columns={1}&Rows={2}&ReadInOneSecond={3}", totalSeconds, cols, rows, Convert.ToInt32(rows / totalSeconds)), ConsoleColor.Red);
                 }
             };
-            reader.Read(new System.IO.FileInfo(filepath));//开始读
+            //reading
+            reader.Read(new System.IO.FileInfo(filePath));
+            //reader.Read(string csvStr);
+            //reader.Read(byte[] bytes);
+            //reader.Read(System.IO.FileInfo file);
+            //reader.Read(System.IO.MemoryStream stream);
+            //reader.Read(System.IO.FileStream stream);
         }
 
         static void CsvWrite(string dir, string saveFilePrefix)

@@ -11,8 +11,8 @@ namespace ZeroCSV.Test
             string dir = AppDomain.CurrentDomain.BaseDirectory;
 
             Console.WriteLine("Writing : ");
-            //CsvWrite(System.IO.Path.Combine(dir, "table_bak"), "table");
-            CsvWriteByEntity(System.IO.Path.Combine(dir, "table_bak"), "table");
+            //DataReaderToCSV(System.IO.Path.Combine(dir, "table_bak"), "table");
+            DataEntityToCSV(System.IO.Path.Combine(dir, "table_bak"), "table");
             
             Console.WriteLine("Reading : ");
             CsvRead(System.IO.Path.Combine(dir, "table_bak/table-1.csv"), 0, 0);
@@ -74,7 +74,7 @@ namespace ZeroCSV.Test
             //reader.Read(System.IO.FileStream stream);
         }
 
-        static void CsvWrite(string dir, string saveFilePrefix)
+        static void DataReaderToCSV(string dir, string saveFilePrefix)
         {
             System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(dir);
             if (!directory.Exists)
@@ -121,12 +121,12 @@ namespace ZeroCSV.Test
 
         }
 
-        public class MyClass
+        public class MyEntity
         {
             public int ID { get; set; }
             public string Name { get; set; }
         }
-        static void CsvWriteByEntity(string dir, string saveFilePrefix)
+        static void DataEntityToCSV(string dir, string saveFilePrefix)
         {
             System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(dir);
             if (!directory.Exists)
@@ -134,7 +134,7 @@ namespace ZeroCSV.Test
                 directory.Create();
             }
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            ZeroCSV.DataEntityToCSV<MyClass> toCSV = new DataEntityToCSV<MyClass>
+            ZeroCSV.DataEntityToCSV<MyEntity> toCSV = new DataEntityToCSV<MyEntity>
             {
                 SaveDir = directory,
                 SaveFilePrefix = saveFilePrefix,
@@ -152,7 +152,7 @@ namespace ZeroCSV.Test
                     ShowMsg(string.Format("FileNum={0}&FileRowNum={1}&SourceRowNum={2} : \r\n【{3}】", e.FileNum, e.FileRowNum, e.SourceRowNum, e.FileRowStr), ConsoleColor.Yellow);
                 },
                 OnWriteBatchEndHandler = (e) => {
-                    //e.Close = true;
+                    //e.Close = e.BatchNum == 2;
                     ShowMsg("Write Batch " + e.BatchNum + " End.");
                 },
                 OnDisposedHandler = () => {
@@ -161,20 +161,21 @@ namespace ZeroCSV.Test
                 }
             };
             stopwatch.Start();
-            //WriteBatch 1:
+            //Write Batch 1:
             toCSV.Write(
-                new MyClass { ID = 1, Name = "Name1" },
-                new MyClass { ID = 2, Name = "Name2" },
-                new MyClass { ID = 3, Name = "Name3" },
-                new MyClass { ID = 4, Name = "Name4" },
-                new MyClass { ID = 5, Name = "Name5" });
-            //WriteBatch 2:
-            List<MyClass> myClasses = new List<MyClass>();
-            myClasses.Add(new MyClass { ID = 6, Name = "Name6" });
-            myClasses.Add(new MyClass { ID = 7, Name = "Name7" });
-            myClasses.Add(new MyClass { ID = 8, Name = "Name8" });
-            myClasses.Add(new MyClass { ID = 9, Name = "Name9" });
-            myClasses.Add(new MyClass { ID = 10, Name = "Name10" });
+                new MyEntity { ID = 1, Name = "Name1" },
+                new MyEntity { ID = 2, Name = "Name2" },
+                new MyEntity { ID = 3, Name = "Name3" },
+                new MyEntity { ID = 4, Name = "Name4" },
+                new MyEntity { ID = 5, Name = "Name5" });
+
+            //Write Batch 2:
+            List<MyEntity> myClasses = new List<MyEntity>();
+            myClasses.Add(new MyEntity { ID = 6, Name = "Name6" });
+            myClasses.Add(new MyEntity { ID = 7, Name = "Name7" });
+            myClasses.Add(new MyEntity { ID = 8, Name = "Name8" });
+            myClasses.Add(new MyEntity { ID = 9, Name = "Name9" });
+            myClasses.Add(new MyEntity { ID = 10, Name = "Name10" });
             toCSV.Write(myClasses);
 
             toCSV.Close();

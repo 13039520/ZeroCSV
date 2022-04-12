@@ -57,8 +57,8 @@ namespace ZeroCSV
         private Encoding _UseEncoding = Encoding.Default;
         private int _ReadBlockSize = 1024 * 4;
         private string _ColSeparator = ",";
-        private string _RowSeparator = "\r\n";
-        private string _StrColBoundaryChars = "\"";
+        private string _LineTerminator = "\r\n";
+        private string _StrColQuote = "\"";
         private int _SkipRows = 0;
         private int _SkipRowsCount = 0;
         /// <summary>
@@ -66,8 +66,8 @@ namespace ZeroCSV
         /// </summary>
         private int _STEP = 0;
         private byte[] _ColSeparatorBytes = null;
-        private byte[] _RowSeparatorBytes = null;
-        private byte[] _StrColBoundaryCharsBytes = null;
+        private byte[] _LineTerminatorBytes = null;
+        private byte[] _StrColQuoteBytes = null;
         private byte[] _StrColEndCharsBytes1 = null;
         private byte[] _StrColEndCharsBytes2 = null;
         private byte[] _StrColSpecialCharsBytes = null;
@@ -82,15 +82,15 @@ namespace ZeroCSV
         private bool _isStrTypeCol = false;
         private bool _isColReaded = true;
         private List<string> _myCols = null;
-        private string _StrColBoundaryChars2 = "";
+        private string _StrColQuote2 = "";
         #endregion
 
         #region -- public properties --
         public int SkipRows { get { return _SkipRows; }set { _SkipRows = value; } }
         public int ReadBlockSize { get { return _ReadBlockSize; }set { if (value > 0) { _ReadBlockSize = value; } } }
         public string ColSeparator { get { return _ColSeparator; } set { _ColSeparator = value; } }
-        public string RowSeparator { get { return _RowSeparator; } set { _RowSeparator = value; } }
-        public string StrColBoundaryChars { get { return _StrColBoundaryChars; } set { _StrColBoundaryChars = value; } }
+        public string LineTerminator { get { return _LineTerminator; } set { _LineTerminator = value; } }
+        public string StrColQuote { get { return _StrColQuote; } set { _StrColQuote = value; } }
         public Encoding UseEncoding { get { return _UseEncoding; } set { _UseEncoding = value; } }
         public HeadHandler OnHeadHandler { get; set; }
         public RowHandler OnRowHandler { get; set; }
@@ -165,34 +165,34 @@ namespace ZeroCSV
                 {
                     throw new Exception("必须指定ColSeparator");
                 }
-                if (string.IsNullOrEmpty(RowSeparator))
+                if (string.IsNullOrEmpty(LineTerminator))
                 {
-                    throw new Exception("必须指定RowSeparator");
+                    throw new Exception("必须指定LineTerminator");
                 }
-                if (string.IsNullOrEmpty(StrColBoundaryChars))
+                if (string.IsNullOrEmpty(StrColQuote))
                 {
-                    StrColBoundaryChars = "";
+                    StrColQuote = "";
                 }
                 _ColSeparatorBytes = UseEncoding.GetBytes(ColSeparator);
-                _RowSeparatorBytes = UseEncoding.GetBytes(RowSeparator);
-                _StrColBoundaryCharsBytes = UseEncoding.GetBytes(StrColBoundaryChars);
+                _LineTerminatorBytes = UseEncoding.GetBytes(LineTerminator);
+                _StrColQuoteBytes = UseEncoding.GetBytes(StrColQuote);
                 _CacheBytes = new byte[0];
                 _ColNames = new List<string>();
                 _ColNameDic = new Dictionary<string, int>();
                 _RowNum = 0;
                 _SkipRowsCount = 0;
-                _StrColBoundaryChars2 = StrColBoundaryChars + StrColBoundaryChars;
+                _StrColQuote2 = StrColQuote + StrColQuote;
                 List<byte> listBytes = new List<byte>();
-                listBytes.AddRange(_StrColBoundaryCharsBytes);
+                listBytes.AddRange(_StrColQuoteBytes);
                 listBytes.AddRange(_ColSeparatorBytes);
                 _StrColEndCharsBytes1 = listBytes.ToArray();
                 listBytes.Clear();
-                listBytes.AddRange(_StrColBoundaryCharsBytes);
-                listBytes.AddRange(_RowSeparatorBytes);
+                listBytes.AddRange(_StrColQuoteBytes);
+                listBytes.AddRange(_LineTerminatorBytes);
                 _StrColEndCharsBytes2 = listBytes.ToArray();
                 listBytes.Clear();
-                listBytes.AddRange(_StrColBoundaryCharsBytes);
-                listBytes.AddRange(_StrColBoundaryCharsBytes);
+                listBytes.AddRange(_StrColQuoteBytes);
+                listBytes.AddRange(_StrColQuoteBytes);
                 _StrColSpecialCharsBytes = listBytes.ToArray();
                 listBytes.Clear();
                 long _FileLen = stream.Length;
@@ -260,14 +260,14 @@ namespace ZeroCSV
                     {
                         #region -- Check line ends --
                         int count = buffer.Length;
-                        int rcbLen = _RowSeparatorBytes.Length;
+                        int rcbLen = _LineTerminatorBytes.Length;
                         if (rcbLen <= count)
                         {
                             int bIndex = count - 1;
                             int sameCount = 0;
                             for (int i = rcbLen - 1; i > -1; i--)
                             {
-                                if (buffer[bIndex] != _RowSeparatorBytes[i])
+                                if (buffer[bIndex] != _LineTerminatorBytes[i])
                                 {
                                     break;
                                 }
@@ -277,7 +277,7 @@ namespace ZeroCSV
                             {
                                 listBytes.AddRange(buffer);
                                 //Supplemental line terminator
-                                listBytes.AddRange(_RowSeparatorBytes);
+                                listBytes.AddRange(_LineTerminatorBytes);
                                 buffer = listBytes.ToArray();
                                 listBytes.Clear();
                             }
@@ -421,11 +421,11 @@ namespace ZeroCSV
         {
             if (SkipRows < 1) { return true; }
             bool reval = false;
-            int myIndex = ByteArrayIndexOf(_CacheBytes, _RowSeparatorBytes, 0);
+            int myIndex = ByteArrayIndexOf(_CacheBytes, _LineTerminatorBytes, 0);
             while (myIndex > -1)
             {
                 _SkipRowsCount++;
-                int n1 = myIndex + _RowSeparatorBytes.Length;
+                int n1 = myIndex + _LineTerminatorBytes.Length;
                 int n2 = _CacheBytes.Length - n1;
                 byte[] t = new byte[n2];
                 Array.Copy(_CacheBytes, n1, t, 0, t.Length);
@@ -436,14 +436,14 @@ namespace ZeroCSV
                     reval = true;
                     break;
                 }
-                myIndex = ByteArrayIndexOf(_CacheBytes, _RowSeparatorBytes, 0);
+                myIndex = ByteArrayIndexOf(_CacheBytes, _LineTerminatorBytes, 0);
             }
             return reval;
         }
         private HeadEventArgs HeadLine()
         {
             HeadEventArgs reval = null;
-            int rowEndIndex = ByteArrayIndexOf(_CacheBytes, _RowSeparatorBytes, 0);
+            int rowEndIndex = ByteArrayIndexOf(_CacheBytes, _LineTerminatorBytes, 0);
             if (rowEndIndex < 0)//line separator not found
             {
                 return reval;
@@ -452,7 +452,7 @@ namespace ZeroCSV
             {
                 throw new Exception("head error");
             }
-            byte[] lineBytes = new byte[rowEndIndex + _RowSeparatorBytes.Length];
+            byte[] lineBytes = new byte[rowEndIndex + _LineTerminatorBytes.Length];
             Array.Copy(_CacheBytes, 0, lineBytes, 0, lineBytes.Length);
 
             int n1 = lineBytes.Length;
@@ -465,7 +465,7 @@ namespace ZeroCSV
             while (colIndex > -1)
             {
                 bool isEnd = false;
-                bool isStrTypeCol = ByteArrayIndexOf(lineBytes, _StrColBoundaryCharsBytes, colIndex) == colIndex;//The first character is the string identifier
+                bool isStrTypeCol = ByteArrayIndexOf(lineBytes, _StrColQuoteBytes, colIndex) == colIndex;//The first character is the string identifier
                 if (isStrTypeCol)//is a string column
                 {
                     int myColEndIndex = GetColEndIndex(lineBytes, colIndex, true);
@@ -473,13 +473,13 @@ namespace ZeroCSV
                     {
                         throw new Exception("Missing column terminator");
                     }
-                    colIndex += _StrColBoundaryCharsBytes.Length;
+                    colIndex += _StrColQuoteBytes.Length;
                     int count = myColEndIndex - colIndex;
                     string s = UseEncoding.GetString(lineBytes, colIndex, count);
                     string ts = UseEncoding.GetString(_StrColSpecialCharsBytes);
                     if (s.IndexOf(ts) > -1)
                     {
-                        s = s.Replace(ts, UseEncoding.GetString(_StrColBoundaryCharsBytes));
+                        s = s.Replace(ts, UseEncoding.GetString(_StrColQuoteBytes));
                     }
                     ts = s.ToLower();
                     if (_ColNameDic.ContainsKey(ts))
@@ -489,7 +489,7 @@ namespace ZeroCSV
                     _ColNameDic.Add(ts, _ColNames.Count);
                     _ColNames.Add(s);
 
-                    if (myColEndIndex + _StrColBoundaryCharsBytes.Length + _RowSeparatorBytes.Length == lineBytes.Length)
+                    if (myColEndIndex + _StrColQuoteBytes.Length + _LineTerminatorBytes.Length == lineBytes.Length)
                     {
                         isEnd = true;
                     }
@@ -503,7 +503,7 @@ namespace ZeroCSV
                     int myColEndIndex = ByteArrayIndexOf(lineBytes, _ColSeparatorBytes, colIndex);
                     if (myColEndIndex < 0)
                     {
-                        myColEndIndex = lineBytes.Length - _RowSeparatorBytes.Length;
+                        myColEndIndex = lineBytes.Length - _LineTerminatorBytes.Length;
                         isEnd = true;
                     }
                     string s = UseEncoding.GetString(lineBytes, colIndex, myColEndIndex - colIndex);
@@ -541,7 +541,7 @@ namespace ZeroCSV
             while (_colsIndex < _colsCount)
             {
                 bool isRowEnd = 1 + _colsIndex >= _colsCount;
-                if(_bodyBytesIndex + _StrColBoundaryCharsBytes.Length >= cLen)
+                if(_bodyBytesIndex + _StrColQuoteBytes.Length >= cLen)
                 {
                     break;
                 }
@@ -550,15 +550,15 @@ namespace ZeroCSV
                     #region -- Step1：Check if it is a string type column --
                     _isColReaded = false;
                     int sameCount = 0;
-                    for (int i = 0; i < _StrColBoundaryCharsBytes.Length; i++)
+                    for (int i = 0; i < _StrColQuoteBytes.Length; i++)
                     {
-                        if (_CacheBytes[_bodyBytesIndex + i] != _StrColBoundaryCharsBytes[i])
+                        if (_CacheBytes[_bodyBytesIndex + i] != _StrColQuoteBytes[i])
                         {
                             break;
                         }
                         sameCount++;
                     }
-                    _isStrTypeCol = sameCount == _StrColBoundaryCharsBytes.Length;
+                    _isStrTypeCol = sameCount == _StrColQuoteBytes.Length;
                     #endregion
                 }
 
@@ -570,7 +570,7 @@ namespace ZeroCSV
                 }
                 else
                 {
-                    byte[] tBytes = _isStrTypeCol ? _StrColEndCharsBytes2 : _RowSeparatorBytes;
+                    byte[] tBytes = _isStrTypeCol ? _StrColEndCharsBytes2 : _LineTerminatorBytes;
                     //The last column should try to read newlines
                     colEndIndex = ByteArrayIndexOf(_CacheBytes, tBytes, _bodyBytesIndex);
                     if (colEndIndex < 0)
@@ -591,7 +591,7 @@ namespace ZeroCSV
                     string colStr = "";
                     if (_isStrTypeCol)
                     {
-                        int beginIndex = _colsBeginIndex + _StrColBoundaryCharsBytes.Length;
+                        int beginIndex = _colsBeginIndex + _StrColQuoteBytes.Length;
                         int count = colEndIndex - beginIndex;
                         if (count > 0)
                         {
@@ -623,7 +623,7 @@ namespace ZeroCSV
                         }
                         else
                         {
-                            _bodyBytesIndex += _RowSeparatorBytes.Length;
+                            _bodyBytesIndex += _LineTerminatorBytes.Length;
                         }
                     }
                     else
@@ -637,9 +637,9 @@ namespace ZeroCSV
                             _bodyBytesIndex += _ColSeparatorBytes.Length;
                         }
                     }
-                    if (_StrColBoundaryChars2.Length > 0 && colStr.IndexOf(_StrColBoundaryChars2) > -1)
+                    if (_StrColQuote2.Length > 0 && colStr.IndexOf(_StrColQuote2) > -1)
                     {
-                        colStr = colStr.Replace(_StrColBoundaryChars2, StrColBoundaryChars);
+                        colStr = colStr.Replace(_StrColQuote2, StrColQuote);
                     }
                     //Record the start position of the next column
                     _colsBeginIndex = _bodyBytesIndex;
@@ -654,7 +654,7 @@ namespace ZeroCSV
                     int len = (_isStrTypeCol ? _StrColEndCharsBytes2 : _ColSeparatorBytes).Length;
                     if (isRowEnd)
                     {
-                        len = (_isStrTypeCol ? _StrColEndCharsBytes2 : _RowSeparatorBytes).Length;
+                        len = (_isStrTypeCol ? _StrColEndCharsBytes2 : _LineTerminatorBytes).Length;
                     }
                     int dif = cLen - len;
                     if (dif > 0)
@@ -669,8 +669,8 @@ namespace ZeroCSV
                 if (isRowEnd)
                 {
                     #region -- Step4：Read to complete row data (callback) --
-                    _bodyBytesIndex -= _RowSeparatorBytes.Length;
-                    int myRowIndex = ByteArrayIndexOf(_CacheBytes, _RowSeparatorBytes, _bodyBytesIndex);
+                    _bodyBytesIndex -= _LineTerminatorBytes.Length;
+                    int myRowIndex = ByteArrayIndexOf(_CacheBytes, _LineTerminatorBytes, _bodyBytesIndex);
                     if (_bodyBytesIndex < 0)
                     {
                         break;
@@ -681,7 +681,7 @@ namespace ZeroCSV
                         //not a newline
                         throw new Exception("Wrong number of columns for row " + _RowNum);
                     }
-                    _bodyBytesIndex += _RowSeparatorBytes.Length;
+                    _bodyBytesIndex += _LineTerminatorBytes.Length;
 
                     reval = new RowEventArgs(_RowNum, _myCols.ToArray(), _ColNameDic);
                     _myCols.Clear();
@@ -749,7 +749,7 @@ namespace ZeroCSV
                 reval = ByteArrayIndexOf(source, _ColSeparatorBytes, sourceIndex);
                 if (reval < 0)//try to find newlines
                 {
-                    reval = ByteArrayIndexOf(source, _RowSeparatorBytes, sourceIndex);
+                    reval = ByteArrayIndexOf(source, _LineTerminatorBytes, sourceIndex);
                 }
             }
             return reval;

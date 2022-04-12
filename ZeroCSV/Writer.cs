@@ -42,8 +42,8 @@ namespace ZeroCSV
         public delegate void DisposedHandler();
 
         private string _ColSeparator = ",";
-        private string _RowSeparator = "\r\n";
-        private string _StrColBoundaryChars = "\"";
+        private string _LineTerminator = "\r\n";
+        private string _StrColQuote = "\"";
         private string[] _ColNames = null;
         private string[] _ColTypeNames = null;
         private bool _ColTypeNamesLoadingFinished = false;
@@ -71,8 +71,8 @@ namespace ZeroCSV
         #region -- public properties --
         protected string[] ColNames { get { return _ColNames; } set { _ColNames = value; } }
         public string ColSeparator { get { return _ColSeparator; } set { _ColSeparator = value; } }
-        public string RowSeparator { get { return _RowSeparator; } set { _RowSeparator = value; } }
-        public string StrColBoundaryChars { get { return _StrColBoundaryChars; } set { _StrColBoundaryChars = value; } }
+        public string LineTerminator { get { return _LineTerminator; } set { _LineTerminator = value; } }
+        public string StrColQuote { get { return _StrColQuote; } set { _StrColQuote = value; } }
         public Encoding UseEncoding { get { return _UseEncoding; } set { _UseEncoding = value; } }
         public System.IO.DirectoryInfo SaveDir { get { return _SaveDir; } set { _SaveDir = value; } }
         public string SaveFilePrefix { get { return _SaveFilePrefix; } set { _SaveFilePrefix = value; } }
@@ -150,7 +150,7 @@ namespace ZeroCSV
                     t[n] = ColToStr(cols[n], "String");
                     n++;
                 }
-                return string.Join(ColSeparator, t) + RowSeparator;
+                return string.Join(ColSeparator, t) + LineTerminator;
             }
             if (!_ColTypeNamesLoadingFinished)
             {
@@ -176,7 +176,7 @@ namespace ZeroCSV
                 s[i] = ColToStr(cols[i], _ColTypeNames[i]);
                 i++;
             }
-            return string.Join(ColSeparator, s) + RowSeparator;
+            return string.Join(ColSeparator, s) + LineTerminator;
         }
         private void Write(string line)
         {
@@ -244,14 +244,14 @@ namespace ZeroCSV
                 case "String":
                     reval = value.ToString();
                     bool hasColSeparator = reval.IndexOf(ColSeparator) > -1;
-                    bool hasStrColBoundaryChars = reval.IndexOf(StrColBoundaryChars) > -1;
-                    if (hasColSeparator || hasStrColBoundaryChars || reval.IndexOf(RowSeparator) > -1)
+                    bool hasStrColBoundaryChars = reval.IndexOf(StrColQuote) > -1;
+                    if (hasColSeparator || hasStrColBoundaryChars || reval.IndexOf(LineTerminator) > -1)
                     {
                         if (hasStrColBoundaryChars)
                         {
-                            reval = reval.Replace(StrColBoundaryChars, StrColBoundaryChars + StrColBoundaryChars);
+                            reval = reval.Replace(StrColQuote, StrColQuote + StrColQuote);
                         }
-                        reval = StrColBoundaryChars + reval + StrColBoundaryChars;
+                        reval = StrColQuote + reval + StrColQuote;
                     }
                     break;
                 case "DateTime":

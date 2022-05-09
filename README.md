@@ -2,7 +2,7 @@
  Read and write large csv files in byte stream mode
 ## CSV file reading example
 ````C#
-static void CsvRead(string filePath, int skipRows, int readLimit)
+static void CsvRead(string filePath, int skipRows, bool withHeader, int readLimit)
 {
     bool useLimit = readLimit > 0;
     int cols = 0;
@@ -10,7 +10,8 @@ static void CsvRead(string filePath, int skipRows, int readLimit)
     System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
     ZeroCSV.Reader reader = new ZeroCSV.Reader
     {
-        SkipRows = skipRows,
+        SkipRows = skipRows, //Default value is 0
+        WithHeader = withHeader, //Default value is true
         UseEncoding = Encoding.Default,
         OnStartHandler = () => {
             stopwatch.Start();

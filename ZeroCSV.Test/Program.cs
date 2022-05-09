@@ -48,12 +48,12 @@ namespace ZeroCSV.Test
                         e.Next = false;//stop
                     }
                     rows = e.RowNum;
-                    //if (rows % 50000 == 0)
-                    //{
+                    if (rows % 5 == 0)
+                    {
                         //string s1 = e.GetValue("FS_WEIGHTNO");
                         //string s2 = e.GetValue(0);
                         ShowMsg(string.Format("Rows {0} : {1}", e.RowNum, string.Join("|", e.Values)));
-                   // }
+                    }
                 },
                 OnEndHandler = (ex) =>
                 {

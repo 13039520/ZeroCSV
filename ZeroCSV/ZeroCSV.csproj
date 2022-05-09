@@ -1,12 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5.0;net2.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net5.0;netcoreapp3.1;net2.0</TargetFrameworks>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageIcon>favicon.png</PackageIcon>
 		<Authors>ruzi</Authors>
+		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<Version>1.0.0.0</Version>
 		<Description>Read and write large csv files in byte stream mode</Description>
-		<PackageProjectUrl>https://github.com/13039520/ZeroCSV.git</PackageProjectUrl>
+		<PackageProjectUrl>https://github.com/13039520/ZeroCSV</PackageProjectUrl>
+		<PackageReleaseNotes></PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="favicon.png" Pack="true" PackagePath="" />

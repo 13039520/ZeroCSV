@@ -98,7 +98,7 @@ static void DataReaderToCSV(string dir, string saveFilePrefix)
     stopwatch.Start();
     toCSV.Write(conn, "SELECT * FROM MyBankStatement");
     //toCSV.Write(System.Data.IDataReader reader);
-
+    toCSV.Close();
 }
 ````
 ### DataEntityToCSV

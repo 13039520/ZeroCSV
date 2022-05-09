@@ -15,14 +15,14 @@ namespace ZeroCSV.Test
             DataEntityToCSV(System.IO.Path.Combine(dir, "table_bak"), "table");
             
             Console.WriteLine("Reading : ");
-            CsvRead(System.IO.Path.Combine(dir, "table_bak/table-1.csv"), 0, 0);
+            CsvRead(System.IO.Path.Combine(dir, "table_bak/table-1.csv"), 1, false, 0);
             
             while (true)
             {
                 System.Threading.Thread.Sleep(1000);
             }
         }
-        static void CsvRead(string filePath, int skipRows, int readLimit)
+        static void CsvRead(string filePath, int skipRows, bool withHeader, int readLimit)
         {
             bool useLimit = readLimit > 0;
             int cols = 0;
@@ -31,6 +31,7 @@ namespace ZeroCSV.Test
             ZeroCSV.Reader reader = new ZeroCSV.Reader
             {
                 SkipRows = skipRows,
+                WithHeader = withHeader,
                 UseEncoding = Encoding.Default,
                 OnStartHandler = () => {
                     stopwatch.Start();
@@ -47,12 +48,12 @@ namespace ZeroCSV.Test
                         e.Next = false;//stop
                     }
                     rows = e.RowNum;
-                    if (rows % 50000 == 0)
-                    {
+                    //if (rows % 50000 == 0)
+                    //{
                         //string s1 = e.GetValue("FS_WEIGHTNO");
                         //string s2 = e.GetValue(0);
                         ShowMsg(string.Format("Rows {0} : {1}", e.RowNum, string.Join("|", e.Values)));
-                    }
+                   // }
                 },
                 OnEndHandler = (ex) =>
                 {

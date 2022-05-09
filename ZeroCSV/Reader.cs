@@ -61,6 +61,7 @@ namespace ZeroCSV
         private string _StrColQuote = "\"";
         private int _SkipRows = 0;
         private int _SkipRowsCount = 0;
+        private bool _WithHeader = true;
         /// <summary>
         /// 读取到的步骤：0 初始 1 完成开始行的确认 2 完成头行的读取 
         /// </summary>
@@ -86,7 +87,14 @@ namespace ZeroCSV
         #endregion
 
         #region -- public properties --
+        /// <summary>
+        /// Default value is 0
+        /// </summary>
         public int SkipRows { get { return _SkipRows; }set { _SkipRows = value; } }
+        /// <summary>
+        /// Default value is true
+        /// </summary>
+        public bool WithHeader { get { return _WithHeader; } set { _WithHeader = value; } }
         public int ReadBlockSize { get { return _ReadBlockSize; }set { if (value > 0) { _ReadBlockSize = value; } } }
         public string ColSeparator { get { return _ColSeparator; } set { _ColSeparator = value; } }
         public string LineTerminator { get { return _LineTerminator; } set { _LineTerminator = value; } }
@@ -461,6 +469,7 @@ namespace ZeroCSV
             Array.Copy(_CacheBytes, n1, t, 0, t.Length);
             _CacheBytes = t;
 
+
             int colIndex = 0;
             while (colIndex > -1)
             {
@@ -481,13 +490,21 @@ namespace ZeroCSV
                     {
                         s = s.Replace(ts, UseEncoding.GetString(_StrColQuoteBytes));
                     }
-                    ts = s.ToLower();
-                    if (_ColNameDic.ContainsKey(ts))
+                    if (WithHeader)
                     {
-                        throw new Exception("Duplicate column name \"" + s + "\"");
+                        ts = s.ToLower();
+                        if (_ColNameDic.ContainsKey(ts))
+                        {
+                            throw new Exception("Duplicate column name \"" + s + "\"");
+                        }
+                        _ColNameDic.Add(ts, _ColNames.Count);
+                        _ColNames.Add(s);
                     }
-                    _ColNameDic.Add(ts, _ColNames.Count);
-                    _ColNames.Add(s);
+                    else
+                    {
+                        _ColNameDic.Add("C" + _ColNames.Count, _ColNames.Count);
+                        _ColNames.Add(s);
+                    }
 
                     if (myColEndIndex + _StrColQuoteBytes.Length + _LineTerminatorBytes.Length == lineBytes.Length)
                     {
@@ -507,13 +524,21 @@ namespace ZeroCSV
                         isEnd = true;
                     }
                     string s = UseEncoding.GetString(lineBytes, colIndex, myColEndIndex - colIndex);
-                    string ts = s.ToLower();
-                    if (_ColNameDic.ContainsKey(ts))
+                    if (WithHeader)
                     {
-                        throw new Exception("Duplicate column name \"" + s + "\"");
+                        string ts = s.ToLower();
+                        if (_ColNameDic.ContainsKey(ts))
+                        {
+                            throw new Exception("Duplicate column name \"" + s + "\"");
+                        }
+                        _ColNameDic.Add(ts, _ColNames.Count);
+                        _ColNames.Add(s);
                     }
-                    _ColNameDic.Add(ts, _ColNames.Count);
-                    _ColNames.Add(s);
+                    else
+                    {
+                        _ColNameDic.Add("C" + _ColNames.Count, _ColNames.Count);
+                        _ColNames.Add(s);
+                    }
                     if (!isEnd)
                     {
                         colIndex = myColEndIndex + _ColSeparatorBytes.Length;
@@ -525,10 +550,33 @@ namespace ZeroCSV
                     break;
                 }
             }
-            reval = new HeadEventArgs(_ColNames.ToArray());
-            if (this.OnHeadHandler != null)
+            if (WithHeader)
             {
-                this.OnHeadHandler(reval);
+                reval = new HeadEventArgs(_ColNames.ToArray());
+                if (this.OnHeadHandler != null)
+                {
+                    this.OnHeadHandler(reval);
+                }
+            }
+            else
+            {
+                string[] arr = new string[_ColNames.Count];
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    arr[i] = _ColNames[i];
+                    _ColNames[i] = "C" + (i+1);
+                }
+                reval = new HeadEventArgs(_ColNames.ToArray());
+                if (this.OnHeadHandler != null)
+                {
+                    this.OnHeadHandler(reval);
+                    if (reval.Next)
+                    {
+                        _RowNum++;
+                        RowEventArgs r = new RowEventArgs(_RowNum, arr, _ColNameDic);
+                        OnRowHandler(r);
+                    }
+                }
             }
             return reval;
 

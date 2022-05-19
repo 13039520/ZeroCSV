@@ -144,7 +144,7 @@ namespace ZeroCSV
                 string fileName = System.IO.Path.Combine(SaveDir.FullName, SaveFilePrefix + "-" + fileNum + ".csv");
                 if (SingleFileRecordLimit < 1)
                 {
-                    System.IO.Path.Combine(SaveDir.FullName, SaveFilePrefix + ".csv");
+                    fileName = System.IO.Path.Combine(SaveDir.FullName, SaveFilePrefix + ".csv");
                 }
                 fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read, 1024, false);
                 isNewFile = true;
@@ -262,7 +262,6 @@ namespace ZeroCSV
         private void Write(string line)
         {
             if (_disposed) { return; }
-            lastRowStr = line;
             if (isFirst)
             {
                 isFirst = false;
@@ -300,6 +299,7 @@ namespace ZeroCSV
                 }
                 catch { }
             }
+            lastRowStr = line;
         }
 
 

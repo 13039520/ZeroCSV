@@ -6,12 +6,12 @@
 		<PackageIcon>favicon.png</PackageIcon>
 		<Authors>ruzi</Authors>
 		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-		<AssemblyVersion>1.0.1.0</AssemblyVersion>
-		<FileVersion>1.0.1.0</FileVersion>
-		<Version>1.0.1.0</Version>
+		<AssemblyVersion>1.0.2.0</AssemblyVersion>
+		<FileVersion>1.0.2.0</FileVersion>
+		<Version>1.0.2.0</Version>
 		<Description>Read and write large csv files in byte stream mode.since version 1.0.1, it is allowed to pass in a stream object through the writer's constructor to receive the resulting bytes, instead of having to write them to a file.</Description>
 		<PackageProjectUrl>https://github.com/13039520/ZeroCSV</PackageProjectUrl>
-		<PackageReleaseNotes>Since version 1.0.1, it is allowed to pass in a stream object through the writer's constructor to receive the resulting bytes, instead of having to write them to a file.</PackageReleaseNotes>
+		<PackageReleaseNotes>The file name created when the SingleFileRecordLimit parameter is less than 1 does not contain the file number</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	</PropertyGroup>
 	<ItemGroup>

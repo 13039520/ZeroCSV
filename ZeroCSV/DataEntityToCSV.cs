@@ -25,6 +25,10 @@ namespace ZeroCSV
         private int propertyCount = 0;
         private int batchNum = 0;
 
+        public DataEntityToCSV() : base() { }
+        public DataEntityToCSV(System.IO.Stream writeStream) : base(writeStream) { }
+        public DataEntityToCSV(System.IO.Stream writeStream, bool ownsStream) : base(writeStream, ownsStream) { }
+
         public WriteBatchEndHandler OnWriteBatchEndHandler { get; set; }
 
         private void PropertyInfoInit()

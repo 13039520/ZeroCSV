@@ -41,6 +41,11 @@ namespace ZeroCSV
         public delegate void WriteFileEndHandler(WriteLineEventArgs args);
         public delegate void DisposedHandler();
 
+        readonly System.IO.Stream writeStream = null;
+        readonly bool ownsStream = false;
+        readonly bool hasWriteStream = false;
+        bool writeStreamFirstGet = true;
+
         private string _ColSeparator = ",";
         private string _LineTerminator = "\r\n";
         private string _StrColQuote = "\"";
@@ -84,6 +89,18 @@ namespace ZeroCSV
         public DisposedHandler OnDisposedHandler { get; set; }
         #endregion
 
+        public Writer():this(null) { }
+        public Writer(System.IO.Stream writeStream):this(writeStream,false) { 
+            
+        }
+        public Writer(System.IO.Stream writeStream, bool ownsStream)
+        {
+            this.writeStream = writeStream;
+            this.ownsStream = ownsStream;
+            this.hasWriteStream = writeStream != null;
+            this.writeStreamFirstGet = true;
+        }
+
         private System.IO.FileStream GetFileStream()
         {
             bool isNewFile = false;
@@ -91,7 +108,7 @@ namespace ZeroCSV
             {
                 if (SingleFileRecordLimit > 0)
                 {
-                    if(fileRowNum >= SingleFileRecordLimit)
+                    if (fileRowNum >= SingleFileRecordLimit)
                     {
                         fileStream.Close();
                         fileStream.Dispose();
@@ -125,6 +142,10 @@ namespace ZeroCSV
                     fileNum++;
                 }
                 string fileName = System.IO.Path.Combine(SaveDir.FullName, SaveFilePrefix + "-" + fileNum + ".csv");
+                if (SingleFileRecordLimit < 1)
+                {
+                    System.IO.Path.Combine(SaveDir.FullName, SaveFilePrefix + ".csv");
+                }
                 fileStream = new System.IO.FileStream(fileName, System.IO.FileMode.Create, System.IO.FileAccess.Write, System.IO.FileShare.Read, 1024, false);
                 isNewFile = true;
             }
@@ -133,6 +154,66 @@ namespace ZeroCSV
                 fileStream.Write(headerBytes, 0, headerBytes.Length);
             }
             return fileStream;
+        }
+        private System.IO.Stream GetWriteStream()
+        {
+            bool isNewFile = false;
+            if (SingleFileRecordLimit > 0)
+            {
+                if (fileRowNum >= SingleFileRecordLimit)
+                {
+                    fileWriteEndNum = fileNum;
+                    if (OnWriteFileEndHandler != null)
+                    {
+                        try
+                        {
+                            OnWriteFileEndHandler(new WriteLineEventArgs(SaveFilePrefix, fileNum, fileRowNum, sourceRowNum, lastRowStr));
+                        }
+                        catch { }
+                    }
+                    lock (fileNumLock)
+                    {
+                        fileNum++;
+                    }
+                    lock (rowNumLock)
+                    {
+                        fileRowNum = 0;
+                    }
+                    isNewFile = true;
+                }
+                else
+                {
+                    if (writeStreamFirstGet)
+                    {
+                        writeStreamFirstGet = false;
+                        isNewFile = true;
+                    }
+                }
+            }
+            else
+            {
+                if (writeStreamFirstGet)
+                {
+                    writeStreamFirstGet = false;
+                    isNewFile = true;
+                }
+            }
+            if (isNewFile)
+            {
+                this.writeStream.Write(headerBytes, 0, headerBytes.Length);
+            }
+            return this.writeStream;
+        }
+        private System.IO.Stream GetStream()
+        {
+            if (this.hasWriteStream)
+            {
+                return GetWriteStream();
+            }
+            else
+            {
+                return GetFileStream();
+            }
         }
         private string ColsToStr(object[] cols)
         {
@@ -202,7 +283,7 @@ namespace ZeroCSV
                 }
                 hasCsvWriteHandler = OnWriteLineHandler != null;
             }
-            var stream = GetFileStream();
+            var stream = GetStream();
             byte[] buffer = UseEncoding.GetBytes(line);
             stream.Write(buffer, 0, buffer.Length);
             //stream.Flush();
@@ -312,6 +393,13 @@ namespace ZeroCSV
                 if (fileStream != null)
                 {
                     fileStream.Dispose();
+                }
+                if (hasWriteStream)
+                {
+                    if (ownsStream)
+                    {
+                        writeStream.Dispose();
+                    }
                 }
                 if(fileWriteEndNum != fileNum)
                 {

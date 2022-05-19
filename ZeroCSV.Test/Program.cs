@@ -134,11 +134,12 @@ namespace ZeroCSV.Test
                 directory.Create();
             }
             System.Diagnostics.Stopwatch stopwatch = new System.Diagnostics.Stopwatch();
-            ZeroCSV.DataEntityToCSV<MyEntity> toCSV = new DataEntityToCSV<MyEntity>
+            System.IO.MemoryStream ms = new System.IO.MemoryStream(1024);
+            ZeroCSV.DataEntityToCSV<MyEntity> toCSV = new DataEntityToCSV<MyEntity>(ms)
             {
                 SaveDir = directory,
                 SaveFilePrefix = saveFilePrefix,
-                SingleFileRecordLimit = 0,
+                SingleFileRecordLimit = 5,
                 UseEncoding = Encoding.Default,
                 DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
                 NumberDisplayToStr = false,
@@ -150,6 +151,7 @@ namespace ZeroCSV.Test
                 },
                 OnWriteFileEndHandler = (e) => {
                     ShowMsg(string.Format("FileNum={0}&FileRowNum={1}&SourceRowNum={2} : \r\n【{3}】", e.FileNum, e.FileRowNum, e.SourceRowNum, e.FileRowStr), ConsoleColor.Yellow);
+                    ShowMsg("Length=" + ms.Length);
                 },
                 OnWriteBatchEndHandler = (e) => {
                     //e.Close = e.BatchNum == 2;
@@ -179,6 +181,10 @@ namespace ZeroCSV.Test
             toCSV.Write(list);
 
             toCSV.Close();
+
+            string s = Encoding.Default.GetString(ms.ToArray());
+            ms.Dispose();
+            Console.WriteLine(s);
 
         }
 

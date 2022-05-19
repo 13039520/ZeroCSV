@@ -24,6 +24,10 @@ namespace ZeroCSV
         private bool isFirst = true;
         private int batchNum = 0;
 
+        public DataReaderToCSV() : base() { }
+        public DataReaderToCSV(System.IO.Stream writeStream) : base(writeStream) { }
+        public DataReaderToCSV(System.IO.Stream writeStream, bool ownsStream) : base(writeStream, ownsStream) { }
+
         public WriteBatchEndHandler OnWriteBatchEndHandler { get; set; }
 
         public void Write(System.Data.IDataReader source)

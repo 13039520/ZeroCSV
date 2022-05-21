@@ -12,10 +12,10 @@ namespace ZeroCSV.Test
 
             Console.WriteLine("Writing : ");
             //DataReaderToCSV(System.IO.Path.Combine(dir, "table_bak"), "table");
-            DataEntityToCSV(System.IO.Path.Combine(dir, "table_bak"), "table");
+            DataEntityToCSV(System.IO.Path.Combine(dir, "table_bak"), "entity");
             
-            Console.WriteLine("Reading : ");
-            CsvRead(System.IO.Path.Combine(dir, "table_bak/table-1.csv"), 1, false, 0);
+            //Console.WriteLine("Reading : ");
+            //CsvRead(System.IO.Path.Combine(dir, "table_bak/table-1.csv"), 1, false, 0);
             
             while (true)
             {
@@ -89,6 +89,7 @@ namespace ZeroCSV.Test
                 SingleFileRecordLimit = 0,
                 UseEncoding = Encoding.Default,
                 DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
+                CustomWriteColNames = "SegmentCode,SegmentName,ProcessCode,ProcessName,ParameterCode,ParameterName".Split(','),
                 NumberDisplayToStr = false,
                 OnWriteLineHandler = (e) => {
                     if (e.FileRowNum % 50000 == 0)
@@ -112,12 +113,12 @@ namespace ZeroCSV.Test
                 }
             };
 
-            string connStr = "Data Source=.;Initial Catalog=BankStatement;User ID=sa;Password=123456;";
+            string connStr = "Data Source=.;Initial Catalog=MyDb001;User ID=sa;Password=123456;";
             Microsoft.Data.SqlClient.SqlConnection conn = new Microsoft.Data.SqlClient.SqlConnection(connStr);
             
             stopwatch.Start();
             //WriteBatch 1:
-            toCSV.Write(conn, "SELECT * FROM MyBankStatement");
+            toCSV.Write(conn, "SELECT * FROM TransRedryingBatchParameterView");
 
         }
 
@@ -139,10 +140,11 @@ namespace ZeroCSV.Test
             {
                 SaveDir = directory,
                 SaveFilePrefix = saveFilePrefix,
-                SingleFileRecordLimit = 5,
+                SingleFileRecordLimit = 0,
                 UseEncoding = Encoding.Default,
                 DateTimeFormat = "yyyy-MM-dd HH:mm:ss.fff",
                 NumberDisplayToStr = false,
+                CustomWriteColNames=new string[] { "name","id" },
                 OnWriteLineHandler = (e) => {
                     if (e.FileRowNum % 50000 == 0)
                     {

@@ -75,6 +75,7 @@ namespace ZeroCSV
 
         #region -- public properties --
         protected string[] ColNames { get { return _ColNames; } set { _ColNames = value; } }
+        public string[] CustomWriteColNames { get; set; }
         public string ColSeparator { get { return _ColSeparator; } set { _ColSeparator = value; } }
         public string LineTerminator { get { return _LineTerminator; } set { _LineTerminator = value; } }
         public string StrColQuote { get { return _StrColQuote; } set { _StrColQuote = value; } }

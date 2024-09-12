@@ -269,13 +269,12 @@ namespace ZeroCSV
                 fileRowNum = 0;
                 fileNum = 0;
                 headerBytes = UseEncoding.GetBytes(ColsToStr(ColNames, true));
-                if (SaveDir == null)
+                if (SaveDir == null || !SaveDir.Exists)
                 {
-                    SaveDir = new System.IO.DirectoryInfo(System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "CsvFiles"));
-                }
-                if (!SaveDir.Exists)
-                {
-                    SaveDir.Create();
+                    if (!hasWriteStream)
+                    {
+                        throw new Exception("Please specify a storage directory via the \"SaveDir\" property");
+                    }
                 }
                 if (string.IsNullOrEmpty(SaveFilePrefix))
                 {

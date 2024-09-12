@@ -6,9 +6,9 @@
 		<PackageIcon>favicon.png</PackageIcon>
 		<Authors>ruzi</Authors>
 		<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-		<AssemblyVersion>1.0.3.0</AssemblyVersion>
-		<FileVersion>1.0.3.0</FileVersion>
-		<Version>1.0.3.0</Version>
+		<AssemblyVersion>1.0.4.0</AssemblyVersion>
+		<FileVersion>1.0.4.0</FileVersion>
+		<Version>1.0.4.0</Version>
 		<Description>Read and write large csv files in byte stream mode. As of version 1.0.1, it is allowed to pass in a stream object through the writer's constructor to receive the resulting bytes without having to write them to a file. Starting from version 1.0.3, when outputting objects to csv, it is allowed to set the fields and their order to output to csv through the "CustomWriteColNames" parameter.</Description>
 		<PackageProjectUrl>https://github.com/13039520/ZeroCSV</PackageProjectUrl>
 		<PackageReleaseNotes>Feature Enhancement Update.</PackageReleaseNotes>
